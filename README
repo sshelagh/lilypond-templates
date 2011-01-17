@@ -1,0 +1,117 @@
+#author Shelagh Manton
+#date
+#title LilyPond-mode usage (LilyPond-Templates)
+
+
+
+** Notes for this selection of files.
+
+Notes on how to use the Lilypond-templates package as well as some brief notes on
+how to better use LilyPond-mode in emacs.
+
+** Installing this package
+
+These files set up a system of menus for some templates I wrote to make
+it easy to use LilyPond for the new user.  To install them, put them in a folder where
+emacs can find them.  For instance in =~/.elisp/site-lisp/LilyPond= .  Then tell emacs where
+it is by writing in your =.emacs= or =.emacs.d/init.el= file (if you are on Windows
+especially)
+
+        =(eval-after-load "LilyPond-mode" (load-library
+                   "~/Path/to/your/lilypond-skeletons.el"))=
+
+
+*** My personal LilyPond setup
+
+looks like this:
+
+      =(autoload 'LilyPond-mode "lilypond-mode" "LilyPond Editing Mode" t)=
+      =(add-to-list 'auto-mode-alist '("\\.ly$" . LilyPond-mode))=
+      =(add-to-list 'auto-mode-alist '("\\.ily$" . LilyPond-mode))=
+
+      =;; adds ~/.elisp/lyqi in the load path
+      (setq load-path (cons (expand-file-name "~/.elisp/site-lisp/lyqi") load-path))=
+      =;; when loading LilyPond-mode, lyqi-mode library will also be loaded.=
+      =;; type `C-c q' in LilyPond-mode to switch to lyqi-mode.=
+
+      =(eval-after-load "LilyPond-mode"=
+         ='(progn=
+            =(load-library "lyqi-mode")=
+            =(define-key LilyPond-mode-map "\C-cq" 'lyqi-mode)=
+            =(define-key LilyPond-mode-map [tab] 'LilyPond-autocompletion)=
+            =(load-library "lilypond-skeletons")=
+            =(lambda () (turn-on-font-lock))))=
+
+** General Emacs LilyPond-mode advice
+
+*** Using the LilyPond info files
+
+To get the most out of the LilyPond info files you need to make sure they are in your info
+path. If they are not in a standard place, which often it seems they are not, find where
+they are in the files system and the write the following.
+=(setq Info-additional-directory-list (quote ("/path/to/info/dir")))= in your .emacs file.
+
+*** Some cool things that can help you write your LilyPond files.
+
+**** Completion
+If you are using a word "LilyPond-mode" knows about ie "inbuilt" functions, you can
+=M-TAB= to complete the word.
+
+**** Counting the beat
+When you are in a complex rhythmic passage and you have lost your idea of how many beats
+there are to a bar "LilyPond-what-beat" will do the counting for you.  Put in a =|= which
+marks the beginning and end of a bar and =\C-c b= on each note or after each note to see how
+many beats you need to have in the bar or whether the note you thought was on 3/4 beat
+actually is.  Try it, this is a cool feature.
+
+**** Dabbrev -- this is a general emacs thing. (info "(Emacs) Dynamic Abbrevs")
+If you have already used a word or term in your LilyPond source file you can write the
+first couple of letters and then press  =M-/= to complete it.  How good would that be; instead of
+writing out Hallelujah ten times in a file?  As dabbrev can look in all open buffers, if the
+word you're looking for isn't in the current buffer keep =M-/= to cycle through the words
+that begin with the letters you've written so far.
+
+**** Abbrevs -- another general emacs thing (info "(Emacs) Abbrevs")
+
+You can set up a system of "abbrevs" or autocorrect in emacs that can make your life easy
+if you want to put in the same phrases such as, say your full name in the composer field. 
+Or as I do, as an automatic spelling fixer.  I put the frequently mis-spelled word and its
+correction in my abbrevs file. Read the info file for more information.  It can be global
+(ie for every text file you use) or local to the mode (specialist terms you may never use
+anywhere else).  So if you always spell "with" -> "wtih" tell "abbrevs" to change it back to
+what you need.  If you are reading this in emacs just evaluate that last s-expression to
+go directly to the info node that gives you all the juice on abbrevs.  See next entry.
+
+
+*** Getting help with the templates
+
+**** Evaluating expressions
+If I've put an expression in the template like this
+=(info "(LilyPond) Bagpipe")= you can put the cursor just after the last parenthesis
+and =C-x C-e= to evaluate it.  Then if you have the LilyPond info files in the
+path (see above) the page in the LilyPond info that deal with bagpipes will
+open up in the other buffer for your perusal.
+
+There is also built-in help from LilyPond-mode itself.  If you put the cursor over the word
+you want to inspect, you can then =\C-c TAB= to get a context sensitive page in the
+LilyPond info documents.
+
+Recently, someone on the mailing list discovered a bug in LilyPond-mode that means that
+the =M-TAB= key does not work as it should to auto-complete keywords and other LilyPond
+terms.  If you put
+
+ =(define-key LilyPond-mode-map [tab] 'LilyPond-autocompletion)=
+
+in your LilyPond-hook auto-completion finally works.  See My personal settings above for my
+settings which now include this hack.
+
+*** Customizing the LilyPond-templates package
+
+If you don't want to have all the templates available, ie if you are only interested in the
+piano templates, you can =M-x customize-group RET LilyPond= to find the variables for
+turning off the various menus.  Just put "nil" for the set of templates you are not
+interested in and the menus for them will disappear.  The variables have names like
+"LilyPond-vocal-templates-p".  All of the templates are available by default.
+
+
+
